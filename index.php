@@ -2,6 +2,13 @@
 // koneksi ke database
 include "database/koneksi.php";
 
+// session_start();
+
+// if( !isset($_SESSION["login"])) {
+//     header("location: log/login.php");
+//     exit;
+// }
+
 
 ?>
 
@@ -26,8 +33,8 @@ include "database/koneksi.php";
 <body id="page-top">
     <div id="wrapper">
         <!-- Sidebar -->
-        <ul class="navbar-nav sidebar sidebar-light accordion" id="accordionSidebar">
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+        <ul class="navbar-nav sidebar sidebar-dark accordion bg-gradient-dark" id="accordionSidebar">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center bg-gradient-dark" href="home.php">
                 <div class="sidebar-brand-icon">
                     <img src="assets/img/cashbook.png">
                 </div>
@@ -35,13 +42,13 @@ include "database/koneksi.php";
             </a>
             <hr class="sidebar-divider my-0">
             <li class="nav-item active">
-                <a class="nav-link" href="?page=dashboard">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
+                <a class="nav-link text-gray-100" href="?page=dashboard">
+                    <i class="fas fa-fw text-gray-100 col col-3 m-lg-0"><img src="assets/img/home.png"></i>
+                    <span class="content m-sm-2">Dashboard</span>
                 </a>
             </li>
             <hr class="sidebar-divider">
-            <div class="sidebar-heading">
+            <div class="sidebar-heading text-gray-100">
                 Features
             </div>
             <!-- <li class="nav-item">
@@ -62,23 +69,23 @@ include "database/koneksi.php";
                 </div>
             </li> -->
             <li class="nav-item active">
-                <a class="nav-link" href="?page=user">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Data User</span>
+                <a class="nav-link text-gray-100" href="?page=user">
+                    <i class="fas fa-fw text-gray-100 col col-3 m-lg-0"><img src="assets/img/typcn_book.png"></i>
+                    <span class="content m-sm-2">Data User</span>
                 </a>
             </li>
 
             <li class="nav-item active">
-                <a class="nav-link" href="?page=kas">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Data Kas Umum</span>
+                <a class="nav-link text-gray-100" href="?page=kas">
+                    <i class="fas fa-fw text-gray-100 col col-3 m-sm-1"><img src="assets/img/kas.png"></i>
+                    <span class="content m-sm-0">Data Kas Umum</span>
                 </a>
             </li>
 
             <li class="nav-item active">
-                <a class="nav-link" href="?page=laporan">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Laporan</span>
+                <a class="nav-link text-gray-100" href="?page=laporan">
+                    <i class="fas fa-fw text-gray-100 col col-3 m-lg-0"><img src="assets/img/laporan.png"></i>
+                    <span class="content m-sm-2">Laporan</span>
                 </a>
             </li>
 
@@ -89,20 +96,20 @@ include "database/koneksi.php";
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
                 <!-- TopBar -->
-                <nav class="navbar navbar-expand navbar-light bg-navbar topbar mb-4 static-top">
-                    <button id="sidebarToggleTop" class="btn btn-link rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
+                <nav class="navbar navbar-expand navbar-light bg-gray-100 topbar mb-4 static-top text-dark">
+                    <button id="sidebarToggleTop" class="btn btn-link rounded-circle mr-3 ">
+                        <i class="fa fa-bars bg-dark"></i>
                     </button>
                     <ul class="navbar-nav ml-auto">
 
                         <div class="topbar-divider d-none d-sm-block"></div>
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img class="img-profile rounded-circle" src="assets/img/boy.png" style="max-width: 60px">
-                                <span class="ml-2 d-none d-lg-inline text-white small">Maman Ketoprak</span>
+                                <i class="fa fa-user-circle text-primary"></i>
+                                <span class="ml-2 d-none d-lg-inline text-dark small">Maman Ketoprak</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="javascript:void(0);" data-toggle="modal" data-target="#logoutModal">
+                                <a class="dropdown-item" href="log/logout.php">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Logout
                                 </a>
