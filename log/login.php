@@ -5,7 +5,19 @@ require '../database/koneksi.php';
 if(isset($_POST["submit"])) {
 
     // ambil data dari form login
+    $username = $_POST["username"];
+    $password = $_POST["password"];
+
+    // cek apakah username dan password sudah ada di database
+    $result = mysqli_query($conn, "SELECT * FROM db_user WHERE username = '".$username."' AND password = '".$password."'");
     
+    $data   = mysqli_fetch_array($result);
+
+    if (mysqli_num_rows($result) > 0) {
+        header("location: ../index.php?page=dashboard");
+    }else{
+        echo "<script>alert('Username dan Password Tidak Sesuai, pastikan anda memasukan Username dan Password yang Benar..!'); document.location.href = 'login.php';</script>";
+    }
 }
 ?>
 
@@ -21,7 +33,7 @@ if(isset($_POST["submit"])) {
     <meta name="description" content="">
     <meta name="author" content="">
     <link href="img/logo/logo.png" rel="icon">
-    <title>RuangAdmin - Login</title>
+    <title>CashBook - Login</title>
     <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href="../assets/css/ruang-admin.min.css" rel="stylesheet">
@@ -44,7 +56,7 @@ if(isset($_POST["submit"])) {
                                     <form class="user" method="POST">
                                         <div class="form-group">
                                             <label for="username" class="font-weight-bold h5 text-dark">USERNAME</label>
-                                            <input type="email" name="username" class="form-control" id="username" aria-describedby="emailHelp" placeholder="Masukan Username">
+                                            <input type="text" name="username" class="form-control" id="username" aria-describedby="emailHelp" placeholder="Masukan Username">
                                         </div>
                                         <div class="form-group mb-5">
                                             <label for="password" class="font-weight-bold h5 text-dark">PASSWORD</label>

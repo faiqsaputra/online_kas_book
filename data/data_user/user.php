@@ -11,18 +11,23 @@ if (isset($_POST["tambah"])) {
 
     // Validasi password minimal 8 karakter
     if (strlen($password) < 8) {
-        echo "<script>alert('mohon maaf password minimal harus terdiri dari 8 karakter');</script>";
+        echo "<script>alert('Password minimal harus terdiri dari 8 karakter.');</script>";
     } elseif ($password !== $confirm_password) {
-        echo "<script>alert('Konfirmasi password tidak sesuai');</script>";
+        echo "<script>alert('Konfirmasi password tidak sesuai.');</script>";
     } else {
-        if (tambah($_POST) > 0) {
-            echo "<script>
-            alert('Data berhasil ditambahkan');
-            document.location.href = 'index.php?page=user';
-            </script>";
-            exit;
-        } else {
-            echo "<script>alert('Maaf terjadi kesalahan, data gagal ditambahkan, coba periksa kembali pastikan data yang anda masukan sesuai dengan ketentuan!');</script>";
+        // Panggil fungsi tambah() dan tangani pesan kesalahan
+        try {
+            if (tambah($_POST)) {
+                echo "<script>
+                alert('Data berhasil ditambahkan');
+                document.location.href = 'index.php?page=user';
+                </script>";
+                exit;
+            } else {
+                throw new Exception("Gagal menambahkan data.");
+            }
+        } catch (Exception $e) {
+            echo "<script>alert('Terjadi kesalahan: " . $e->getMessage() . "');</script>";
         }
     }
 }
@@ -51,18 +56,18 @@ if (isset($_POST["edit"]))
 
 
 // aksi hapus data
-    if(isset($_POST["hapus"]))
+if (isset($_POST["hapus"]))
 
-        if(hapus($_POST) > 0){
-            echo "<script>
+    if (hapus($_POST) > 0) {
+        echo "<script>
                 alert('data berhasil di hapus');
                 document.location.href = 'index.php?page=user';
                 </script>";
-            }else{
-                echo "<script>
+    } else {
+        echo "<script>
                     alert('terjadi kesalahan, data gagal dihapus')
                     </script>";
-            }
+    }
 
 // kode otomatis id_user
 $no = mysqli_query($conn, "SELECT id_user FROM db_user ORDER BY id_user DESC");
@@ -117,21 +122,21 @@ if (strlen($tambah) == 1) {
                                     <td class="text-center"><?= $row["level"]; ?></td>
                                     <td>
 
-                                    <div class="text-center">
-                                        <form action="" method="POST" class="inline">
-                                            <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#edit<?= $row["id_user"]; ?>">
-                                                <i class="fa fa-edit"></i>
-                                                Edit
-                                            </button>
+                                        <div class="text-center">
+                                            <form action="" method="POST" class="inline">
+                                                <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#edit<?= $row["id_user"]; ?>">
+                                                    <i class="fa fa-edit"></i>
+                                                    Edit
+                                                </button>
 
-                                            <input type="hidden" name="id_user" id="id_user" class="form-control" required autocomplete="off" value="<?= $row['id_user']?>" readonly>
+                                                <input type="hidden" name="id_user" id="id_user" class="form-control" required autocomplete="off" value="<?= $row['id_user'] ?>" readonly>
 
-                                            <button type="submit" name="hapus" id="hapus" class="btn btn-danger btn-sm" onclick="return confirm('Apakah anda yakin ingin menghapus data user yang ada')">
-                                                <i class="fa fa-trash"></i>
-                                                Hapus
-                                            </button>
-                                        </form>
-                                    </div>
+                                                <button type="submit" name="hapus" id="hapus" class="btn btn-danger btn-sm" onclick="return confirm('Apakah anda yakin ingin menghapus data user yang ada')">
+                                                    <i class="fa fa-trash"></i>
+                                                    Hapus
+                                                </button>
+                                            </form>
+                                        </div>
 
                                         <!-- Modal Edit Data -->
                                         <div class="modal fade" id="edit<?= $row["id_user"]; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-label="true">
@@ -198,20 +203,22 @@ if (strlen($tambah) == 1) {
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-label="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-primary text-gray-100">
                 <h1 class="modal-title" id="exampleModallabel">Tambah Data User</h1>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="" method="POST">
+                <form action="" method="POST"> 
                     <div class="form-group">
                         <label for="id_user">Id User</label>
-                        <input type="text" name="id_user" id="id_user" class="form-control" value="<?php echo $format1; ?>" require autocomplete="off" readonly>
+                        <input type="text" name="id_user" id="id_user" class="form-control" value="<?php echo $format1; ?>" required autocomplete="off" readonly> <!-- Memperbaiki atribut required -->
+                        <!-- Tambahkan validasi di sini jika diperlukan -->
 
                         <label for="username">Username</label>
-                        <input type="text" name="username" id="username" class="form-control" require autocomplete="off">
+                        <input type="text" name="username" id="username" class="form-control" required autocomplete="off">
+                        <!-- Tambahkan validasi di sini jika diperlukan -->
 
                         <label for="level">Level</label>
                         <select name="level" id="level" class="form-control" required>
@@ -221,13 +228,26 @@ if (strlen($tambah) == 1) {
                         </select>
 
                         <label for="password">Password</label>
-                        <input type="password" name="password" id="password" class="form-control" required autocomplete="off">
-                        <input type="checkbox" id="togglePassword1"> Perlihatkan
-                        <br>
+                        <div class="input-group"> <!-- Menambahkan input-group untuk checkbox -->
+                            <input type="password" name="password" id="password" class="form-control" required autocomplete="off">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <input type="checkbox" id="togglePassword1"> <!-- Checkbox untuk memperlihatkan password -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Tambahkan validasi di sini jika diperlukan -->
 
-                        <label for="password2">Konfirmasi Password</label>
-                        <input type="password" name="confirm_password" id="confirm_password" class="form-control" required autocomplete="off">
-                        <input type="checkbox" id="toggleconfirm_password"> Perlihatkan
+                        <label for="confirm_password">Konfirmasi Password</label>
+                        <div class="input-group"> <!-- Menambahkan input-group untuk checkbox -->
+                            <input type="password" name="confirm_password" id="confirm_password" class="form-control" required autocomplete="off">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <input type="checkbox" id="toggleconfirm_password"> <!-- Checkbox untuk memperlihatkan password -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Tambahkan validasi di sini jika diperlukan -->
 
                     </div>
                     <div class="modal-footer">
