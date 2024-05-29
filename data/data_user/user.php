@@ -1,8 +1,19 @@
 <?php
 require 'functions.php';
+session_start();
+
+// Setelah itu, periksa apakah pengguna sudah login
+if (isset($_SESSION["login"])) {
+    // Jika sudah login, periksa level pengguna
+    if ($_SESSION["level"] == "admin") {
+        // Jika level adalah "admin", tampilkan tombol untuk mengakses data pengguna
+        echo '<a href="user.php" class="btn btn-primary">Data User</a>';
+    }
+}
 
 // tampil data user
 $db_user = query("SELECT * FROM db_user");
+
 
 // Form submission handling
 if (isset($_POST["tambah"])) {
@@ -34,25 +45,21 @@ if (isset($_POST["tambah"])) {
 
 
 // Edit data user 
-if (isset($_POST["edit"]))
-
-    if (strlen($password) < 8) {
-        echo "<script>alert('mohon maaf password minimal harus terdiri dari 8 karakter');</script>";
-    } elseif ($password !== $passwordlama) {
-        echo "<script>
-        alert('Konfirmasi password tidak sesuai dengan password lama, mohon cek kembali dan pastikan untuk memasukan password yang benar');
-        </script>";
-    } else {
-        if (edit($_POST) > 0) {
+if (isset($_POST["edit"])) {
+    try {
+        if (edit($_POST)) {
             echo "<script>
-        alert('Data berhasil dirubah');
-        document.location.href = 'index.php?page=user';
-        </script>";
+            alert('Data berhasil dirubah');
+            document.location.href = 'index.php?page=user';
+            </script>";
             exit;
         } else {
-            echo "<script>alert('Maaf terjadi kesalahan, data gagal ditambahkan, coba periksa kembali pastikan data yang anda masukan sesuai dengan ketentuan!');</script>";
+            echo "<script>alert('Maaf terjadi kesalahan, data gagal dirubah.');</script>";
         }
+    } catch (Exception $e) {
+        echo "<script>alert('" . $e->getMessage() . "');</script>";
     }
+}
 
 
 // aksi hapus data
@@ -99,7 +106,9 @@ if (strlen($tambah) == 1) {
             <div class="card mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">Datatables</h6>
-                    <button type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-primary"><i class="fa fa-user"></i> Tambah Data </button>
+                    <?php if ($_SESSION['user_level'] == 'admin') : ?>
+                        <button type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-primary"><i class="fa fa-user"></i> Tambah Data </button>
+                    <?php endif; ?>
                 </div>
                 <div class="table-responsive p-3">
                     <table class="table align-items-center table-flush" id="dataTable">
@@ -124,17 +133,17 @@ if (strlen($tambah) == 1) {
 
                                         <div class="text-center">
                                             <form action="" method="POST" class="inline">
-                                                <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#edit<?= $row["id_user"]; ?>">
-                                                    <i class="fa fa-edit"></i>
-                                                    Edit
-                                                </button>
+                                                <?php if ($_SESSION['user_level'] == 'admin') : ?>
+                                                    <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#edit<?= $row["id_user"]; ?>">
+                                                        <i class="fa fa-edit"></i> Edit
+                                                    </button>
 
-                                                <input type="hidden" name="id_user" id="id_user" class="form-control" required autocomplete="off" value="<?= $row['id_user'] ?>" readonly>
+                                                    <input type="hidden" name="id_user" id="id_user" class="form-control" required autocomplete="off" value="<?= $row['id_user'] ?>" readonly>
 
-                                                <button type="submit" name="hapus" id="hapus" class="btn btn-danger btn-sm" onclick="return confirm('Apakah anda yakin ingin menghapus data user yang ada')">
-                                                    <i class="fa fa-trash"></i>
-                                                    Hapus
-                                                </button>
+                                                    <button type="submit" name="hapus" id="hapus" class="btn btn-danger btn-sm" onclick="return confirm('Apakah anda yakin ingin menghapus data user yang ada')">
+                                                        <i class="fa fa-trash"></i> Hapus
+                                                    </button>
+                                                <?php endif; ?>
                                             </form>
                                         </div>
 
@@ -165,9 +174,9 @@ if (strlen($tambah) == 1) {
 
                                                                 <label for="level">Level</label>
                                                                 <select name="level" id="level" class="form-control" required>
-                                                                    <option value="admin">Admin</option>
-                                                                    <option value="pengelola">Pengelola</option>
-                                                                    <option value="anggota">Anggota</option>
+                                                                    <option value="admin" <?= $row['level'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
+                                                                    <option value="pengelola" <?= $row['level'] == 'pengelola' ? 'selected' : ''; ?>>Pengelola</option>
+                                                                    <option value="anggota" <?= $row['level'] == 'anggota' ? 'selected' : ''; ?>>Anggota</option>
                                                                 </select>
 
                                                                 <label for="passwordlama">Password Lama</label>
@@ -210,15 +219,13 @@ if (strlen($tambah) == 1) {
                 </button>
             </div>
             <div class="modal-body">
-                <form action="" method="POST"> 
+                <form action="" method="POST">
                     <div class="form-group">
                         <label for="id_user">Id User</label>
-                        <input type="text" name="id_user" id="id_user" class="form-control" value="<?php echo $format1; ?>" required autocomplete="off" readonly> <!-- Memperbaiki atribut required -->
-                        <!-- Tambahkan validasi di sini jika diperlukan -->
+                        <input type="text" name="id_user" id="id_user" class="form-control" value="<?php echo $format1; ?>" required autocomplete="off" readonly>
 
                         <label for="username">Username</label>
                         <input type="text" name="username" id="username" class="form-control" required autocomplete="off">
-                        <!-- Tambahkan validasi di sini jika diperlukan -->
 
                         <label for="level">Level</label>
                         <select name="level" id="level" class="form-control" required>
@@ -228,27 +235,24 @@ if (strlen($tambah) == 1) {
                         </select>
 
                         <label for="password">Password</label>
-                        <div class="input-group"> <!-- Menambahkan input-group untuk checkbox -->
+                        <div class="input-group">
                             <input type="password" name="password" id="password" class="form-control" required autocomplete="off">
                             <div class="input-group-append">
                                 <div class="input-group-text">
-                                    <input type="checkbox" id="togglePassword1"> <!-- Checkbox untuk memperlihatkan password -->
+                                    <input type="checkbox" id="togglePassword1"> Perlihatkan
                                 </div>
                             </div>
                         </div>
-                        <!-- Tambahkan validasi di sini jika diperlukan -->
 
                         <label for="confirm_password">Konfirmasi Password</label>
-                        <div class="input-group"> <!-- Menambahkan input-group untuk checkbox -->
+                        <div class="input-group">
                             <input type="password" name="confirm_password" id="confirm_password" class="form-control" required autocomplete="off">
                             <div class="input-group-append">
                                 <div class="input-group-text">
-                                    <input type="checkbox" id="toggleconfirm_password"> <!-- Checkbox untuk memperlihatkan password -->
+                                    <input type="checkbox" id="toggleconfirm_password"> Perlihatkan
                                 </div>
                             </div>
                         </div>
-                        <!-- Tambahkan validasi di sini jika diperlukan -->
-
                     </div>
                     <div class="modal-footer">
                         <button type="submit" name="tambah" class="btn btn-primary">Simpan</button>

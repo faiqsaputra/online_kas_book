@@ -78,44 +78,69 @@ function insertUser($id_user, $username, $password_hashed, $level) {
     }
 }
 
-// function ubah data siswa
-function edit($data){
+function edit($data) {
     global $conn;
-    $id_user =htmlspecialchars($data["id_user"]);
-    $username =htmlspecialchars($data["username"]);
-    $level =htmlspecialchars($data["level"]);
-    $password =htmlspecialchars($data["password"]);
-    $passwordlama =htmlspecialchars($data["passwordlama"]);                
-    $passwordbaru =htmlspecialchars($data["passwordbaru"]);
+
+    // Ambil data dari form
+    $id_user = htmlspecialchars($data["id_user"]);
+    $username = htmlspecialchars($data["username"]);
+    $level = htmlspecialchars($data["level"]);
+    $passwordlama = htmlspecialchars($data["passwordlama"]);
+    $passwordbaru = htmlspecialchars($data["passwordbaru"]);
+
+    // Validasi data
+    if (empty($id_user) || empty($username) || empty($level)) {
+        throw new Exception("Semua bidang kecuali password baru harus diisi.");
+    }
+
+    // Variabel untuk menyimpan password yang akan digunakan
+    $password_hashed = '';
+
+    // Jika password baru diisi, lakukan validasi
+    if (!empty($passwordbaru)) {
+        if (strlen($passwordbaru) < 8) {
+            throw new Exception("Password baru harus terdiri dari minimal 8 karakter.");
+        }
+
+        // Verifikasi password lama
+        $stmt = $conn->prepare("SELECT password FROM db_user WHERE id_user = ?");
+        $stmt->bind_param("s", $id_user);
+        $stmt->execute();
+        $stmt->bind_result($stored_password);
+        $stmt->fetch();
+        $stmt->close();
+
+        if (!password_verify($passwordlama, $stored_password)) {
+            throw new Exception("Password lama tidak sesuai.");
+        }
+
+        // Hash password baru
+        $password_hashed = password_hash($passwordbaru, PASSWORD_DEFAULT);
+    } else {
+        // Jika password baru kosong, gunakan password lama dari database
+        $stmt = $conn->prepare("SELECT password FROM db_user WHERE id_user = ?");
+        $stmt->bind_param("s", $id_user);
+        $stmt->execute();
+        $stmt->bind_result($stored_password);
+        $stmt->fetch();
+        $stmt->close();
+
+        $password_hashed = $stored_password;
+    }
+
+    // Update data
+    $stmt = $conn->prepare("UPDATE db_user SET username = ?, level = ?, password = ? WHERE id_user = ?");
+    $stmt->bind_param("ssss", $username, $level, $password_hashed, $id_user);
+    $stmt->execute();
+
+    if ($stmt->affected_rows <= 0) {
+        throw new Exception("Gagal mengubah data pengguna.");
+    }
+
+    $stmt->close();
+
+    return true;
 }
-
-// Validasi password minimal 8 karakter
-if (strlen($password) < 8) {
-    return 0; // Password kurang dari 8 karakter, return 0 untuk menandakan gagal
-}
-
-// verifikasi password
-if ($password !== $passwordlama ){
-    echo "<script>
-    alert('Konfirmasi password tidak sesuai dengan password lama, mohon cek kembali dan pastikan untuk memasukan password yang benar');
-    </script>";
-    return false;
-}
-
-// Hash password jika password tidak kosong
-$password_hashed = !empty($password) ? password_hash($password, PASSWORD_DEFAULT) : null;
-
-
-// query update data
-$query = "UPDATE db_user SET 
-            username = '$username',
-            level    = '$level',
-            password = '$passwordbaru'
-            where id_user = '$id_user'
-            ";
-
-mysqli_query($conn, $query);
-return mysqli_affected_rows($conn);
 
 // Fungsi hapus data
 function hapus($data) {
@@ -128,5 +153,17 @@ function hapus($data) {
     mysqli_query($conn, $query);
 
     return mysqli_affected_rows($conn);
+}
+
+function checkUserRole($allowed_roles) {
+    session_start();
+    $user_level = $_SESSION['user_level'];
+    
+    if (!in_array($user_level, $allowed_roles)) {
+        // Jika pengguna tidak memiliki akses, arahkan ke halaman lain atau tampilkan pesan kesalahan
+        // Misalnya, arahkan ke halaman dashboard dengan pesan kesalahan
+        header("location: ../index.php?page=dashboard&error=access_denied");
+        exit();
+    }
 }
 ?>

@@ -2,6 +2,10 @@
 
 require '../database/koneksi.php';
 
+if (isset($_SESSION["login"])) {
+
+}
+
 if(isset($_POST["submit"])) {
 
     // ambil data dari form login
@@ -14,12 +18,24 @@ if(isset($_POST["submit"])) {
     $data   = mysqli_fetch_array($result);
 
     if (mysqli_num_rows($result) > 0) {
+        // Mulai session
+        session_start();
+        // Set session untuk menandai bahwa pengguna sudah login
+        $_SESSION["login"] = true;
+        // Set session untuk menyimpan nama pengguna yang login
+        $_SESSION["username"] = $data['username'];
+        // Set session untuk menyimpan level pengguna yang login
+        $_SESSION['user_level'] = $data['level'];
+        // Redirect ke halaman dashboard setelah login berhasil
         header("location: ../index.php?page=dashboard");
-    }else{
-        echo "<script>alert('Username dan Password Tidak Sesuai, pastikan anda memasukan Username dan Password yang Benar..!'); document.location.href = 'login.php';</script>";
+        exit(); // Pastikan untuk keluar dari skrip setelah mengalihkan pengguna
+    } else {
+        // Jika username atau password tidak cocok, tampilkan pesan kesalahan
+        echo "<script>alert('Username dan Password Tidak Sesuai, pastikan anda memasukan Username dan Password yang Benar..!');</script>";
     }
 }
 ?>
+
 
 
 <!DOCTYPE html>
@@ -32,7 +48,7 @@ if(isset($_POST["submit"])) {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link href="img/logo/logo.png" rel="icon">
+    <link href="../assets/img/Frame 296 (1).png" rel="icon">
     <title>CashBook - Login</title>
     <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">

@@ -2,10 +2,10 @@
 // koneksi ke database
 include "database/koneksi.php";
 
-// session_start();
+session_start();
 
-// if( !isset($_SESSION["login"])) {
-//     header("location: log/login.php");
+// if( !isset($_SESSION["home"])) {
+//     header("location: home.php");
 //     exit;
 // }
 
@@ -29,6 +29,25 @@ include "database/koneksi.php";
     <link href="assets/css/ruang-admin.min.css" rel="stylesheet">
     <link href="assets/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
+
+<style>
+    /* Styling untuk ikon pengguna */
+.user-icon {
+    font-size: 24px; /* Ubah ukuran ikon sesuai kebutuhan */
+}
+
+/* Styling untuk informasi pengguna */
+.user-info {
+    font-size: 14px; /* Ukuran teks informasi pengguna */
+}
+
+/* Efek hover untuk item dropdown */
+.dropdown-item:hover {
+    background-color: #f8f9fc; /* Ubah warna latar belakang saat hover */
+    color: #000; /* Ubah warna teks saat hover */
+}
+
+</style>
 
 <body id="page-top">
     <div id="wrapper">
@@ -105,8 +124,14 @@ include "database/koneksi.php";
                         <div class="topbar-divider d-none d-sm-block"></div>
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-user-circle text-primary"></i>
-                                <span class="ml-2 d-none d-lg-inline text-dark small">Maman Ketoprak</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="user-icon mr-2">
+                                        <i class="fa fa-user-circle text-primary"></i>
+                                    </div>
+                                    <div class="user-info d-none d-lg-inline-block mb-1">
+                                        <span class="text-dark h5 font-weight-lighter"><?php echo $_SESSION['username']; ?></span>
+                                    </div>
+                                </div>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="log/logout.php">

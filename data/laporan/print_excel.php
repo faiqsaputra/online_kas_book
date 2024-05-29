@@ -13,8 +13,21 @@ function tgl_indo($tanggal)
     return date('d/m/Y', strtotime($tanggal));
 }
 
-// Tampil data kas umum
-$query = mysqli_query($conn, "SELECT * FROM db_kas");
+// Validasi input tanggal
+$tgl_awal = $_POST["tgl_awal"];
+$tgl_akhir = $_POST["tgl_akhir"];
+
+if (!preg_match("/^\d{4}-\d{2}-\d{2}$/", $tgl_awal) || !preg_match("/^\d{4}-\d{2}-\d{2}$/", $tgl_akhir)) {
+    // Tampilkan pesan kesalahan jika format tanggal tidak sesuai
+    echo "Format tanggal tidak valid!";
+    exit();
+}
+
+// Kueri SQL menggunakan prepared statements
+$stmt = $conn->prepare("SELECT * FROM db_kas WHERE tanggal BETWEEN ? AND ?");
+$stmt->bind_param("ss", $tgl_awal, $tgl_akhir);
+$stmt->execute();
+$result = $stmt->get_result();
 
 $filename = "kas_excel-" . date('d-m-Y') . ".csv";
 
@@ -38,7 +51,7 @@ $saldo = 0;
 $header_style = 'font-weight: bold; background-color: #f2f2f2;';
 $data_style = 'background-color: #ffffff;';
 
-while ($row = mysqli_fetch_assoc($query)) {
+while ($row = $result->fetch_assoc()) {
     $kas_masuk += $row['kas_masuk'];
     $kas_keluar += $row['kas_keluar'];
     $saldo += $row['kas_masuk'] - $row['kas_keluar'];
@@ -63,3 +76,4 @@ while ($row = mysqli_fetch_assoc($query)) {
 
 // Tutup file CSV
 fclose($file);
+?>

@@ -1,6 +1,15 @@
 <?php
 include './database/koneksi.php'; // file koneksi ke database
 include 'functions.php';
+session_start();
+
+if (isset($_SESSION["login"])) {
+    // Jika sudah login, periksa level pengguna
+    if ($_SESSION["level"] == "pengelola") {
+        // Jika level adalah "admin", tampilkan tombol untuk mengakses data pengguna
+        echo '<a href="kas.php" class="btn btn-primary">Data Kas</a>';
+    }
+}
 
 header('Content-Type: application/json');
 
@@ -83,16 +92,18 @@ function num($rp)
                 <hr>
             </div>
             <div class="card mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <button type="button" data-toggle="modal" data-target="#kasmasuk" class="btn btn-success">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
-                            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0" />
-                        </svg> Kas Masuk</button>
-                    <button type="button" data-toggle="modal" data-target="#kaskeluar" class="btn btn-success">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
-                            <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0" />
-                        </svg> Kas Keluar</button>
-                </div>
+                <?php if ($_SESSION['user_level'] == 'pengelola') : ?>
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <button type="button" data-toggle="modal" data-target="#kasmasuk" class="btn btn-success">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
+                                <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0" />
+                            </svg> Kas Masuk</button>
+                        <button type="button" data-toggle="modal" data-target="#kaskeluar" class="btn btn-success">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
+                                <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0" />
+                            </svg> Kas Keluar</button>
+                    </div>
+                <?php endif; ?>
                 <div class="table-responsive p-3">
                     <table class="table align-items-center table-flush" id="dataTable">
                         <thead class="thead-light">
@@ -127,9 +138,11 @@ function num($rp)
                                         ?>
                                     </td>
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editkas<?= $row["id_kas"]; ?>">Edit</button>
-                                        <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#hapus<?= $row["id_kas"]; ?>">Hapus</button>
-
+                                        <?php if ($_SESSION['user_level'] == 'pengelola') : ?>
+                                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editkas<?= $row["id_kas"]; ?>">Edit</button>
+                                            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#hapus<?= $row["id_kas"]; ?>">Hapus</button>
+                                        <?php endif; ?>
+                                        
                                         <!-- Modal Edit -->
                                         <div class="modal fade" id="editkas<?= $row["id_kas"]; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog" role="document">

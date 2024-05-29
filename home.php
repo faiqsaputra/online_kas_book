@@ -172,7 +172,7 @@ include "database/koneksi.php";
                             </h2>
                             <p class="modal-dialog ml-0 mt-0 h5" style="">Pencatat pemasukan, pengeluaran, dan utang-piutang. Lengkap dengan fitur multiuser, laporan kas, dan online invoice. Mudah dan praktis untuk UMKM, pribadi, organisasi, dan bisnis.</p>
                         </div>
-                        <a href="../db_online_kas/log/login.php" class="d-flex justify-content-center align-items-center btn btn-success" style="text-decoration: none; transition: transform 0.2s; height: 3rem; width: 15rem;">
+                        <a href="../buku_kas/log/login.php" class="d-flex justify-content-center align-items-center btn btn-success" style="text-decoration: none; transition: transform 0.2s; height: 3rem; width: 15rem;">
                             <h5 class="mr-3 mt-2 mb-2">Get Started</h5>
                             <i class="fa fa-angle-right"></i>
                             <i class="fa fa-angle-right"></i>
@@ -187,7 +187,7 @@ include "database/koneksi.php";
             <!-- Footer -->
             <footer class="sticky-footer " style="background-color: #000000;">
                 <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
+                    <div class="copyright text-center my-auto text-gray-100">
                         <span>copyright &copy; <script>
                                 document.write(new Date().getFullYear());
                             </script> - developed by
